@@ -5,7 +5,7 @@ import Combine
 
 @MainActor
 class LaunchAtLoginManager: ObservableObject {
-    private let logger = Logger(subsystem: "com.coderfee.Emus", category: "LaunchAtLogin")
+    private let logger = Logger(subsystem: "com.coderfee.emus", category: "LaunchAtLogin")
     private let service = SMAppService.mainApp
     
     @Published var isEnabled: Bool = false
@@ -25,19 +25,22 @@ class LaunchAtLoginManager: ObservableObject {
             return
         }
         
-        if isEnabled {
-            do {
-                try service.register()
-                logger.info("Registered")
-            } catch {
-                logger.error("Register failed: \(error)")
-                isEnabled = false
-            }
-        } else {
-            service.unregister { [weak self] error in
-                if let error = error {
-                    self?.logger.error("Unregister failed: \(error)")
-                    Task { @MainActor in self?.isEnabled = true }
+        Task { @MainActor in
+            if isEnabled {
+                do {
+                    try service.register()
+                    logger.info("Registered")
+                } catch {
+                    logger.error("Register failed: \(error)")
+                    isEnabled = false
+                }
+            } else {
+                do {
+                    try await service.unregister()
+                    logger.info("Unregistered")
+                } catch {
+                    logger.error("Unregister failed: \(error)")
+                    isEnabled = true
                 }
             }
         }
