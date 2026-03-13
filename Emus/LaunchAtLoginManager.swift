@@ -19,6 +19,12 @@ class LaunchAtLoginManager: ObservableObject {
     }
     
     func toggle() {
+        let isCurrentlyRegistered = (service.status == .enabled)
+        
+        if isEnabled == isCurrentlyRegistered {
+            return
+        }
+        
         if isEnabled {
             do {
                 try service.register()

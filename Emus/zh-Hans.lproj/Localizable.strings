@@ -37,3 +37,9 @@
 "Tip: Changes to filters will take effect after the next refresh." = "提示：过滤器更改将在下次刷新后生效。";
 "Reset" = "重置";
 "Settings" = "设置";
+"Error" = "错误";
+"Invalid Android SDK Path" = "无效的 Android SDK 路径";
+"The directory does not exist." = "该目录不存在。";
+"Cannot find 'emulator' executable at:\n%@\n\nPlease make sure the Android SDK path is correct." = "无法在以下位置找到 'emulator' 可执行文件：\n%@\n\n请确保 Android SDK 路径正确。";
+"The 'emulator' file exists but is not executable." = "'emulator' 文件存在但没有可执行权限。";
+"OK" = "确定";

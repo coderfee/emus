@@ -12,21 +12,20 @@ enum BootMode: Sendable {
     case cold
     case headless
     case wipe
-    case shutdown
 }
 
 struct Device: Identifiable, Hashable, Sendable {
     let id: String
     let name: String
     let type: DeviceType
-    let isBooted: Bool
-    let version: String    // e.g., "17.5"
-    let platform: String   // e.g., "iOS", "tvOS"
+    let version: String
+    let platform: String
 }
 
 @MainActor
 class SimulatorManager: ObservableObject {
     @Published var devices: [Device] = []
+    @Published var lastErrorMessage: String?
     
     private nonisolated var androidSdkPath: String {
         UserDefaults.standard.string(forKey: "androidSdkPath") ?? "/Users/\(NSUserName())/Library/Android/sdk"
@@ -89,7 +88,6 @@ class SimulatorManager: ObservableObject {
                     for device in devices {
                         if let name = device["name"] as? String,
                            let udid = device["udid"] as? String,
-                           let state = device["state"] as? String,
                            let isAvailable = device["isAvailable"] as? Bool,
                            isAvailable {
                             let fullName = "\(name) (\(osVersion))"
@@ -97,7 +95,6 @@ class SimulatorManager: ObservableObject {
                                 id: udid,
                                 name: fullName,
                                 type: .ios,
-                                isBooted: state == "Booted",
                                 version: osVersion,
                                 platform: platform
                             ))
@@ -121,7 +118,7 @@ class SimulatorManager: ObservableObject {
                 return iosDevices
             }
         } catch {
-            print("Error fetching iOS devices: \(error)")
+            print("iOS Refresh Error: \(error.localizedDescription)")
         }
         return []
     }
@@ -138,21 +135,15 @@ class SimulatorManager: ObservableObject {
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             if let output = String(data: data, encoding: .utf8) {
                 let lines = output.components(separatedBy: .newlines).filter { !$0.isEmpty }
-                return lines.map { Device(id: $0, name: $0, type: .android, isBooted: false, version: "", platform: "Android") }
+                return lines.map { Device(id: $0, name: $0, type: .android, version: "", platform: "Android") }
             }
         } catch {
-            print("Error fetching Android devices: \(error)")
+            print("Android Refresh Error: \(error.localizedDescription) Path: \(emulatorPath)")
         }
         return []
     }
     
     func bootDevice(_ device: Device, mode: BootMode = .standard) {
-        if mode == .shutdown && !device.isBooted { return }
-        if mode == .standard && device.isBooted && device.type == .ios {
-            activateSimulatorApp(path: openPath)
-            return
-        }
-
         switch device.type {
         case .ios:
             bootIOS(device, mode: mode)
@@ -168,32 +159,93 @@ class SimulatorManager: ObservableObject {
         try? process.run()
     }
     
+    nonisolated static func getLocString(_ key: String) -> String {
+        let language = UserDefaults.standard.string(forKey: "appLanguage") ?? "system"
+        if language == "system" { return NSLocalizedString(key, comment: "") }
+        guard let path = Bundle.main.path(forResource: language, ofType: "lproj"),
+              let bundle = Bundle(path: path) else { return NSLocalizedString(key, comment: "") }
+        return NSLocalizedString(key, bundle: bundle, comment: "")
+    }
+
+    @MainActor
+    static func showAlert(title: String, message: String, style: NSAlert.Style = .warning, buttons: [String] = [String(localized: "OK")]) -> NSApplication.ModalResponse {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.alertStyle = style
+        for button in buttons {
+            alert.addButton(withTitle: button)
+        }
+        
+        NSApp.activate(ignoringOtherApps: true)
+        
+        if let window = NSApp.keyWindow, window.isVisible {
+            alert.beginSheetModal(for: window, completionHandler: nil)
+            return .alertFirstButtonReturn
+        } else {
+            return alert.runModal()
+        }
+    }
+
+    nonisolated static func validateAndroidSdkPath(_ path: String) -> (isValid: Bool, message: String?) {
+        let emulatorPath = "\(path)/emulator/emulator"
+        let fileManager = FileManager.default
+        
+        var isDir: ObjCBool = false
+        if !fileManager.fileExists(atPath: path, isDirectory: &isDir) {
+            return (false, getLocString("The directory does not exist."))
+        }
+        
+        if !fileManager.fileExists(atPath: emulatorPath) {
+            let pattern = getLocString("Cannot find 'emulator' executable at:\n%@\n\nPlease make sure the Android SDK path is correct.")
+            return (false, String(format: pattern, emulatorPath))
+        }
+        
+        if !fileManager.isExecutableFile(atPath: emulatorPath) {
+            return (false, getLocString("The 'emulator' file exists but is not executable."))
+        }
+        
+        return (true, nil)
+    }
+    
+    nonisolated private func showError(_ message: String) {
+        Task { @MainActor in
+            _ = SimulatorManager.showAlert(
+                title: SimulatorManager.getLocString("Error"),
+                message: message
+            )
+        }
+    }
+    
     private func bootIOS(_ device: Device, mode: BootMode) {
         let xcPath = xcrunPath
         let opPath = openPath
         DispatchQueue.global(qos: .userInitiated).async {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: xcPath)
+            let errorPipe = Pipe()
+            process.standardError = errorPipe
             
             switch mode {
-            case .shutdown:
-                process.arguments = ["simctl", "shutdown", device.id]
             case .wipe:
                 process.arguments = ["simctl", "erase", device.id]
             default:
                 process.arguments = ["simctl", "boot", device.id]
             }
             
-            try? process.run()
-            process.waitUntilExit()
-            
-            if case .shutdown = mode {
-            } else {
-                self.activateSimulatorApp(path: opPath)
-            }
-            
-            DispatchQueue.main.async {
-                self.fetchDevices()
+            do {
+                try process.run()
+                process.waitUntilExit()
+                
+                if process.terminationStatus != 0 {
+                    let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+                    let errorString = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+                    self.showError("iOS Error: \(errorString)")
+                } else {
+                    self.activateSimulatorApp(path: opPath)
+                }
+            } catch {
+                self.showError("Failed to run xcrun: \(error.localizedDescription)")
             }
         }
     }
@@ -203,6 +255,8 @@ class SimulatorManager: ObservableObject {
         DispatchQueue.global(qos: .userInitiated).async {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: emuPath)
+            let errorPipe = Pipe()
+            process.standardError = errorPipe
             var args = ["-avd", device.id]
             
             switch mode {
@@ -217,10 +271,18 @@ class SimulatorManager: ObservableObject {
             }
             
             process.arguments = args
-            try? process.run()
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                self.fetchDevices()
+            do {
+                try process.run()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    if !process.isRunning && process.terminationStatus != 0 {
+                        let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+                        let errorString = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+                        self.showError("Android Error: \(errorString)")
+                    }
+                }
+            } catch {
+                self.showError("Failed to run emulator: \(error.localizedDescription)")
             }
         }
     }

@@ -47,6 +47,9 @@ struct SettingsView: View {
                         TextField("", text: $androidSdkPath)
                             .labelsHidden()
                             .textFieldStyle(.roundedBorder)
+                            .onSubmit {
+                                validatePath()
+                            }
                         
                         Button("Browse...") {
                             let panel = NSOpenPanel()
@@ -54,12 +57,15 @@ struct SettingsView: View {
                             panel.canChooseDirectories = true
                             panel.canChooseFiles = false
                             if panel.runModal() == .OK {
-                                androidSdkPath = panel.url?.path ?? androidSdkPath
+                                let newPath = panel.url?.path ?? androidSdkPath
+                                androidSdkPath = newPath
+                                validatePath()
                             }
                         }
                         
                         Button("Reset") {
                             androidSdkPath = "/Users/\(NSUserName())/Library/Android/sdk"
+                            validatePath()
                         }
                     }
                     
@@ -79,6 +85,24 @@ struct SettingsView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 NSApp.activate(ignoringOtherApps: true)
                 launchManager.refreshStatus()
+            }
+        }
+    }
+    
+    private func validatePath() {
+        let currentPath = androidSdkPath
+        Task {
+            let result = await Task.detached(priority: .userInitiated) {
+                return SimulatorManager.validateAndroidSdkPath(currentPath)
+            }.value
+            
+            if !result.isValid, let message = result.message {
+                await MainActor.run {
+                    _ = SimulatorManager.showAlert(
+                        title: SimulatorManager.getLocString("Invalid Android SDK Path"),
+                        message: message
+                    )
+                }
             }
         }
     }

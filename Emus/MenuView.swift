@@ -21,12 +21,6 @@ struct MenuView: View {
                                 Label("Boot", systemImage: "play.fill")
                             }
                             
-                            Button {
-                                simulatorManager.bootDevice(device, mode: .shutdown)
-                            } label: {
-                                Label("Shutdown", systemImage: "power")
-                            }
-                            
                             Button(role: .destructive) {
                                 confirmWipe(for: device)
                             } label: {
@@ -121,20 +115,21 @@ struct MenuView: View {
     }
 
     private func confirmWipe(for device: Device) {
-        let alert = NSAlert()
+        let title = SimulatorManager.getLocString("Wipe Confirmation")
+        let messagePattern = SimulatorManager.getLocString("Are you sure you want to wipe all data for '%@'? This action cannot be undone.")
+        let message = String(format: messagePattern, device.name)
         
-        alert.messageText = String(localized: "Wipe Confirmation", locale: locale)
+        let response = SimulatorManager.showAlert(
+            title: title,
+            message: message,
+            style: .critical,
+            buttons: [
+                SimulatorManager.getLocString("Wipe"),
+                SimulatorManager.getLocString("Cancel")
+            ]
+        )
         
-        let messagePattern = String(localized: "Are you sure you want to wipe all data for '%@'? This action cannot be undone.", locale: locale)
-        alert.informativeText = String(format: messagePattern, device.name)
-        
-        alert.alertStyle = .critical
-        alert.addButton(withTitle: String(localized: "Wipe", locale: locale))
-        alert.addButton(withTitle: String(localized: "Cancel", locale: locale))
-        
-        NSApp.activate(ignoringOtherApps: true)
-        
-        if alert.runModal() == .alertFirstButtonReturn {
+        if response == .alertFirstButtonReturn {
             simulatorManager.bootDevice(device, mode: .wipe)
         }
     }
