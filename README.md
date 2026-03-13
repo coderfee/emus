@@ -18,6 +18,14 @@ A minimal macOS menu bar app for managing iOS and Android simulators/emulators i
 
 ## Installation
 
+### From Release (Recommended)
+1. Download the latest `.dmg` file from the [Releases](https://github.com/coderfee/emus/releases) page.
+2. Drag **Emus** to your `Applications` folder.
+
+> [!IMPORTANT]
+> **About Code Signing**: As this app is not signed with an Apple Developer certificate, macOS may prevent it from opening. 
+> To bypass this, **right-click** (or Control-click) the app icon in your Applications folder and select **Open**, then click **Open** again in the confirmation dialog.
+
 ### Build from source
 ```bash
 # Clone the repository
