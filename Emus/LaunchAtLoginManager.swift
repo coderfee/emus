@@ -25,22 +25,21 @@ class LaunchAtLoginManager: ObservableObject {
             return
         }
         
-        Task { @MainActor in
-            if isEnabled {
-                do {
-                    try service.register()
-                    logger.info("Registered")
-                } catch {
-                    logger.error("Register failed: \(error)")
-                    isEnabled = false
-                }
-            } else {
-                do {
-                    try await service.unregister()
-                    logger.info("Unregistered")
-                } catch {
-                    logger.error("Unregister failed: \(error)")
-                    isEnabled = true
+        if isEnabled {
+            do {
+                try service.register()
+                logger.info("Registered")
+            } catch {
+                logger.error("Register failed: \(error)")
+                isEnabled = false
+            }
+        } else {
+            service.unregister { [weak self] error in
+                if let error = error {
+                    self?.logger.error("Unregister failed: \(error)")
+                    DispatchQueue.main.async {
+                        self?.isEnabled = true
+                    }
                 }
             }
         }
