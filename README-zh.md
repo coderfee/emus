@@ -16,9 +16,6 @@
 
 ## 安装
 
-### 下载安装
-从 [Releases](https://github.com/coderfee/Emus/releases) 页面下载最新版本。
-
 ### 源码编译
 ```bash
 # 克隆仓库

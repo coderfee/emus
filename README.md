@@ -1,5 +1,7 @@
 # Emus
 
+[简体中文](./README-zh.md)
+
 A minimal macOS menu bar app for managing iOS and Android simulators/emulators in one place.
 
 ## Features
@@ -15,9 +17,6 @@ A minimal macOS menu bar app for managing iOS and Android simulators/emulators i
 - 🌍 Multilingual support: English, Simplified Chinese, Traditional Chinese
 
 ## Installation
-
-### Download
-Download the latest version from the [Releases](https://github.com/coderfee/Emus/releases) page.
 
 ### Build from source
 ```bash
