@@ -17,6 +17,7 @@
 "Cancel" = "取消";
 "Wipe" = "確定清除";
 "Language" = "介面語言";
+"Launch at Login" = "登入時啟動";
 "Interface Language:" = "介面語言：";
 "System Default" = "跟隨系統";
 "English" = "英文";
@@ -30,7 +31,7 @@
 "Device Filters" = "裝置過濾";
 "Hide Apple Watch Simulators" = "隱藏 Apple Watch 模擬器";
 "Hide Apple TV Simulators" = "隱藏 Apple TV 模擬器";
-"Only Show Latest System Versions" = "僅显示最新系統版本";
+"Only Show Latest System Versions" = "僅顯示最新系統版本";
 "Tip: Changes to filters will take effect after the next refresh." = "提示：過濾器更改將在下次重新整理後生效。";
 "Reset" = "重設";
 "Settings" = "設定";
