@@ -29,7 +29,7 @@ jobs:
             -configuration Release \
             -archivePath build/Emus.xcarchive \
             MARKETING_VERSION="$VERSION" \
-            CURRENT_PROJECT_VERSION="$VERSION" \
+            CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
             CODE_SIGNING_ALLOWED=YES \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="-"
