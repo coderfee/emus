@@ -26,6 +26,12 @@ A minimal macOS menu bar app for managing iOS and Android simulators/emulators i
 > **About Code Signing**: As this app is not signed with an Apple Developer certificate, macOS may prevent it from opening. 
 > To bypass this, **right-click** (or Control-click) the app icon in your Applications folder and select **Open**, then click **Open** again in the confirmation dialog.
 
+**Still showing "Damaged"?**
+If you see a message saying "Emus.app is damaged", run the following command in Terminal:
+```bash
+sudo xattr -rd com.apple.quarantine /Applications/Emus.app
+```
+
 ### Build from source
 ```bash
 # Clone the repository

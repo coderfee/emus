@@ -21,14 +21,16 @@ jobs:
             -scheme Emus \
             -configuration Release \
             -archivePath build/Emus.xcarchive \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_ALLOWED=YES \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_IDENTITY=""
+            CODE_SIGN_IDENTITY="-"
 
       - name: Export App
         run: |
           mkdir -p build/Export
           cp -R build/Emus.xcarchive/Products/Applications/Emus.app build/Export/Emus.app
+          # 显式执行一次 ad-hoc 签名确保生效
+          codesign --force --deep --sign - build/Export/Emus.app
 
       - name: Create DMG
         run: |
