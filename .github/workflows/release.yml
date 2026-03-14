@@ -69,7 +69,6 @@ jobs:
         run: |
           mkdir -p build/Export
           cp -R build/Emus.xcarchive/Products/Applications/Emus.app build/Export/Emus.app
-          # 显式执行一次 ad-hoc 签名确保生效
           codesign --force --deep --sign - build/Export/Emus.app
 
       - name: Create DMG
