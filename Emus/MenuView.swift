@@ -82,7 +82,7 @@ struct MenuView: View {
             }
             .keyboardShortcut("R")
 
-            Button(SimulatorManager.getLocString("Check for Updates...")) {
+            Button("Check for Updates") {
                 Task {
                     await UpdateManager.checkForUpdates(manual: true, language: appLanguage)
                 }

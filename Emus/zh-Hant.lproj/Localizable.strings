@@ -3,7 +3,7 @@
 "Android Emulators" = "Android 模擬器";
 "No Android Emulators found" = "未找到 Android 模擬器";
 "Refresh List" = "重新整理列表";
-"Check for Updates..." = "檢查更新...";
+"Check for Updates" = "檢查更新";
 "Quit" = "結束";
 "Activate" = "啟用";
 "Boot" = "啟動";
