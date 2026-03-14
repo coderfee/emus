@@ -13,6 +13,7 @@ enum UpdateManager {
         case invalidReleaseURL
     }
 
+    @MainActor
     static func checkForUpdates(manual: Bool, language: String) async {
         guard let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
             if manual {
@@ -63,6 +64,7 @@ enum UpdateManager {
         }
     }
 
+    @MainActor
     private static func showCheckFailed(language: String) {
         _ = SimulatorManager.showAlert(
             title: localized("Update Check Failed", language: language),
