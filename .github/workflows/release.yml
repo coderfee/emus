@@ -1,6 +1,7 @@
 name: Build and Release
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
@@ -14,13 +15,45 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Extract version from tag
+      - name: Read version from project
         run: |
-          # 从tag中提取版本号，移除v前缀
-          VERSION=${GITHUB_REF_NAME#v}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Using version: $VERSION"
+          VERSION_INFO="$(scripts/read-project-version.sh --github-env)"
+          printf '%s\n' "$VERSION_INFO" >> "$GITHUB_ENV"
+          printf '%s\n' "$VERSION_INFO"
+
+      - name: Resolve tag name
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            TAG_NAME="$RELEASE_TAG"
+          else
+            TAG_NAME="$GITHUB_REF_NAME"
+          fi
+          echo "TAG_NAME=$TAG_NAME" >> "$GITHUB_ENV"
+          echo "Using tag: $TAG_NAME"
+
+      - name: Validate tag matches project version
+        run: |
+          if [ "$TAG_NAME" != "$RELEASE_TAG" ]; then
+            echo "::error::Tag $TAG_NAME does not match project MARKETING_VERSION $MARKETING_VERSION"
+            exit 1
+          fi
+
+      - name: Create tag from project version
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git fetch --tags
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "::error::Tag $TAG_NAME already exists"
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+          git push origin "$TAG_NAME"
 
       - name: Build App
         run: |
@@ -28,8 +61,6 @@ jobs:
             -scheme Emus \
             -configuration Release \
             -archivePath build/Emus.xcarchive \
-            MARKETING_VERSION="$VERSION" \
-            CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
             CODE_SIGNING_ALLOWED=YES \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="-"
@@ -52,13 +83,14 @@ jobs:
             --icon "Emus.app" 200 190 \
             --hide-extension "Emus.app" \
             --app-drop-link 600 185 \
-            "Emus-${{ github.ref_name }}.dmg" \
+            "Emus-$TAG_NAME.dmg" \
             "build/Export/"
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: Emus-${{ github.ref_name }}.dmg
+          tag_name: ${{ env.TAG_NAME }}
+          files: Emus-${{ env.TAG_NAME }}.dmg
           draft: false
           prerelease: false
           generate_release_notes: true
