@@ -3,6 +3,7 @@
 "Android Emulators" = "Android Emulators";
 "No Android Emulators found" = "No Android Emulators found";
 "Refresh List" = "Refresh List";
+"Check for Updates..." = "Check for Updates...";
 "Quit" = "Quit";
 "Activate" = "Activate";
 "Boot" = "Boot";
@@ -47,3 +48,11 @@
 "About" = "About";
 "Version %@ (%@)" = "Version %@ (%@)";
 "Project Homepage" = "Project Homepage";
+"Update Available" = "Update Available";
+"A new version %@ is available. You are currently using %@.\n\nEmus will open the download page. Quit Emus before replacing the app in Applications." = "A new version %@ is available. You are currently using %@.\n\nEmus will open the download page. Quit Emus before replacing the app in Applications.";
+"Download" = "Download";
+"Later" = "Later";
+"You are up to date." = "You are up to date.";
+"Current version: %@." = "Current version: %@.";
+"Update Check Failed" = "Update Check Failed";
+"Unable to check for updates right now. Please try again later." = "Unable to check for updates right now. Please try again later.";

@@ -81,6 +81,12 @@ struct MenuView: View {
                 simulatorManager.fetchDevices()
             }
             .keyboardShortcut("R")
+
+            Button(SimulatorManager.getLocString("Check for Updates...")) {
+                Task {
+                    await UpdateManager.checkForUpdates(manual: true, language: appLanguage)
+                }
+            }
             
             SettingsLink {
                 Text("Settings")
