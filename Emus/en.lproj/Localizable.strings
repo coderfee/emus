@@ -43,3 +43,6 @@
 "Cannot find 'emulator' executable at:\n%@\n\nPlease make sure the Android SDK path is correct." = "Cannot find 'emulator' executable at:\n%@\n\nPlease make sure the Android SDK path is correct.";
 "The 'emulator' file exists but is not executable." = "The 'emulator' file exists but is not executable.";
 "OK" = "OK";
+"About" = "About";
+"Version %@ (%@)" = "Version %@ (%@)";
+"Project Homepage" = "Project Homepage";

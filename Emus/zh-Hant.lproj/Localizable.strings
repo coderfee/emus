@@ -43,3 +43,6 @@
 "OK" = "確定";
 "General" = "一般";
 "Advanced" = "進階";
+"About" = "關於";
+"Version %@ (%@)" = "版本 %@ (%@)";
+"Project Homepage" = "項目主頁";

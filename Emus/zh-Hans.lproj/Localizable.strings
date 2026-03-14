@@ -43,3 +43,6 @@
 "Cannot find 'emulator' executable at:\n%@\n\nPlease make sure the Android SDK path is correct." = "无法在以下位置找到 'emulator' 可执行文件：\n%@\n\n请确保 Android SDK 路径正确。";
 "The 'emulator' file exists but is not executable." = "'emulator' 文件存在但没有可执行权限。";
 "OK" = "确定";
+"About" = "关于";
+"Version %@ (%@)" = "版本 %@ (%@)";
+"Project Homepage" = "项目主页";
