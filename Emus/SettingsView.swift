@@ -2,6 +2,9 @@ import SwiftUI
 
 struct SettingsView: View {
     @AppStorage("appLanguage") private var appLanguage: String = "system"
+    private let minWindowWidth: CGFloat = 460
+    private let idealWindowWidth: CGFloat = 480
+    private let windowHeight: CGFloat = 500
 
     var body: some View {
         TabView {
@@ -15,7 +18,12 @@ struct SettingsView: View {
                     Label("About", systemImage: "info.circle")
                 }
         }
-        .frame(width: 500, height: 450)
+        .frame(
+            minWidth: minWindowWidth,
+            idealWidth: idealWindowWidth,
+            minHeight: windowHeight,
+            idealHeight: windowHeight
+        )
         .id(appLanguage)
     }
 }

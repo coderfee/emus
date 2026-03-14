@@ -40,6 +40,7 @@
 "Error" = "Error";
 "Invalid Android SDK Path" = "Invalid Android SDK Path";
 "The directory does not exist." = "The directory does not exist.";
+"The selected path is not a directory." = "The selected path is not a directory.";
 "Cannot find 'emulator' executable at:\n%@\n\nPlease make sure the Android SDK path is correct." = "Cannot find 'emulator' executable at:\n%@\n\nPlease make sure the Android SDK path is correct.";
 "The 'emulator' file exists but is not executable." = "The 'emulator' file exists but is not executable.";
 "OK" = "OK";

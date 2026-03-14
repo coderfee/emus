@@ -38,6 +38,7 @@
 "Error" = "錯誤";
 "Invalid Android SDK Path" = "無效的 Android SDK 路徑";
 "The directory does not exist." = "該目錄不存在。";
+"The selected path is not a directory." = "所選路徑不是目錄。";
 "Cannot find 'emulator' executable at:\n%@\n\nPlease make sure the Android SDK path is correct." = "無法在以下位置找到 'emulator' 可執行文件：\n%@\n\n請確保 Android SDK 路徑正確。";
 "The 'emulator' file exists but is not executable." = "「emulator」檔案存在但沒有可執行權限。";
 "OK" = "確定";

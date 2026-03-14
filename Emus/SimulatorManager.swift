@@ -31,8 +31,12 @@ class SimulatorManager: ObservableObject {
         UserDefaults.standard.string(forKey: "androidSdkPath") ?? "/Users/\(NSUserName())/Library/Android/sdk"
     }
     
-    private nonisolated var hideWatch: Bool { UserDefaults.standard.bool(forKey: "hideWatchSimulators") }
-    private nonisolated var hideTV: Bool { UserDefaults.standard.bool(forKey: "hideTVSimulators") }
+    private nonisolated var hideWatch: Bool {
+        (UserDefaults.standard.object(forKey: "hideWatchSimulators") as? Bool) ?? true
+    }
+    private nonisolated var hideTV: Bool {
+        (UserDefaults.standard.object(forKey: "hideTVSimulators") as? Bool) ?? true
+    }
     private nonisolated var onlyLatest: Bool { UserDefaults.standard.bool(forKey: "onlyShowLatest") }
     
     private nonisolated var emulatorPath: String { "\(androidSdkPath)/emulator/emulator" }
@@ -179,12 +183,7 @@ class SimulatorManager: ObservableObject {
         
         NSApp.activate(ignoringOtherApps: true)
         
-        if let window = NSApp.keyWindow, window.isVisible {
-            alert.beginSheetModal(for: window, completionHandler: nil)
-            return .alertFirstButtonReturn
-        } else {
-            return alert.runModal()
-        }
+        return alert.runModal()
     }
 
     nonisolated static func validateAndroidSdkPath(_ path: String) -> (isValid: Bool, message: String?) {
@@ -194,6 +193,10 @@ class SimulatorManager: ObservableObject {
         var isDir: ObjCBool = false
         if !fileManager.fileExists(atPath: path, isDirectory: &isDir) {
             return (false, getLocString("The directory does not exist."))
+        }
+
+        if !isDir.boolValue {
+            return (false, getLocString("The selected path is not a directory."))
         }
         
         if !fileManager.fileExists(atPath: emulatorPath) {
