@@ -2,7 +2,7 @@
 
 [简体中文](./README-zh.md)
 
-A minimal macOS menu bar app for managing iOS and Android simulators/emulators in one place.
+A minimal macOS menu bar app for managing Apple simulators and Android emulators in one place.
 
 ## Features
 
@@ -46,8 +46,8 @@ open Emus.xcodeproj
 
 ## Requirements
 - macOS 13.0+ (Ventura)
-- Xcode (for iOS simulators)
-- Android Studio (for Android emulators)
+- Xcode (for Apple simulators)
+- Android SDK (the `emulator` command must be available)
 
 ## Usage
 1. Launch Emus from your Applications folder
@@ -60,7 +60,7 @@ open Emus.xcodeproj
 Emus is built with SwiftUI and uses native system frameworks:
 - No third-party dependencies
 - 100% native SwiftUI interface
-- Uses `simctl` for iOS simulator management
+- Uses `simctl` for Apple simulator management
 - Uses `emulator` command line tool for Android emulator management
 
 ## License

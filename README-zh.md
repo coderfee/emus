@@ -2,7 +2,7 @@
 
 [English](./README.md)
 
-一个极简的 macOS 菜单栏应用，可在一个地方管理 iOS 和 Android 模拟器。
+一个极简的 macOS 菜单栏应用，可在一个地方管理 Apple 模拟器和 Android 模拟器。
 
 ## 功能
 
@@ -46,8 +46,8 @@ open Emus.xcodeproj
 
 ## 要求
 - macOS 13.0+ (Ventura)
-- Xcode (用于 iOS 模拟器)
-- Android Studio (用于 Android 模拟器)
+- Xcode (用于 Apple 模拟器)
+- Android SDK（需可用 `emulator` 命令）
 
 ## 使用
 1. 从应用程序文件夹启动 Emus
@@ -60,7 +60,7 @@ open Emus.xcodeproj
 Emus 使用 SwiftUI 构建并使用原生系统框架：
 - 无第三方依赖
 - 100% 原生 SwiftUI 界面
-- 使用 `simctl` 进行 iOS 模拟器管理
+- 使用 `simctl` 进行 Apple 模拟器管理
 - 使用 `emulator` 命令行工具进行 Android 模拟器管理
 
 ## 许可证
